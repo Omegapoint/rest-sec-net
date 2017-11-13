@@ -24,7 +24,7 @@ namespace Demo
 
     public class Product
     {
-        private const int MinAge = 58;
+        private const int MinAge = 8;
 
         public string Name => "My Product";
 

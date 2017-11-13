@@ -9,7 +9,7 @@ namespace Demo
 {
     public class JwksStore
     {
-        private readonly string url = "https://opkoko-identity.azurewebsites.net/.well-known/jwks";
+        private readonly string url = "http://localhost:5000/jwks";
 
         public IEnumerable<SecurityKey> GetSigningKeys()
         {
