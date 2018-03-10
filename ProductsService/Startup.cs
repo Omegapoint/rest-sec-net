@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Demo
+namespace ProductsService
 {
     public class Startup
     {
@@ -17,7 +17,7 @@ namespace Demo
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.RequireHttpsMetadata = false; // Only for testing purposes
-                    options.Authority = "http://localhost:4000";
+                    options.Authority = "http://localhost:50111/";
                     options.Audience = "https://example.com/api";
                 });
 

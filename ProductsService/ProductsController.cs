@@ -1,9 +1,7 @@
-using System.Linq;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Demo
+namespace ProductsService
 {
     [Route("products")]
     public class ProductsController : Controller
@@ -13,7 +11,7 @@ namespace Demo
         {
             var product = new Product(); // repository
 
-            if (!product.CanGet(User))
+            if (!product.CanRead(User))
             {
                 return Forbid();
             }
@@ -24,18 +22,11 @@ namespace Demo
 
     public class Product
     {
-        private const int MinAge = 8;
-
         public string Name => "My Product";
 
-        public bool CanGet(ClaimsPrincipal principal)
+        public bool CanRead(ClaimsPrincipal principal)
         {
-            var ageClaimValue = principal
-                .Claims
-                .FirstOrDefault(claim => claim.Type == "urn:omegapoint:age")
-                ?.Value;
-
-            return int.TryParse(ageClaimValue, out var age) && age >= MinAge;
+            return principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("read:product"));
         }
     }
 }
