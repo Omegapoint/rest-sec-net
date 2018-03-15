@@ -17,7 +17,7 @@ namespace ProductsService
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.RequireHttpsMetadata = false; // Only for testing purposes
-                    options.Authority = "http://localhost:50111/";
+                    options.Authority = "http://localhost:4000/";
                     options.Audience = "https://example.com/api";
                 });
 
