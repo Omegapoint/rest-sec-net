@@ -19,18 +19,18 @@ cd IdentityService
 dotnet run 
 ```
 
-Note the host and port where the identity service starts (typically
-http://localhost:4000).  Update the Authority URL in class Startup to
-point to your identity service.  In the second terminal, start the
-products service.
+Note the host and port where the identity service starts (we will
+assume http://localhost:4000 for the rest of these instructions).
+Update the Authority URL in class Startup to point to your identity
+service.  In the second terminal, start the products service.
 
 ```shell
 cd ProductsService
-dotnet run --urls http://localhost:5000
+dotnet run
 ```
 
-You will need to select a different port than the token service is
-using, like we did above.
+Note the host and port where the products service starts (we will
+assume http://localhost:4000 for the rest of these instructions).
 
 You can now first verify that you will get a 401 from the products
 service:
