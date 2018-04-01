@@ -1,36 +1,41 @@
 What is this?
 -------------
 
-This directory holds the source code that was the result of the
-presentation on Service API security at OpKoKo 17.2, Skövde.
+This presentation holds the source code for the course on secure REST
+API in ASP.NET Core, in C#.
 
-Since the presentation, it has been expanded to contain a proper
-identity service, that support the OAuth2 client_credentials grant
-type , found in folder "IdentityService".  The code that we created in
-the presentation, is found in folder "ProductsService".
+There are a number of branches, each representing the different labs
+that comprise the course:
+
+  * `lab/1` Authentication & Authorization
+  * `lab/2` Error handling
+  * `lab/3` Test driven development
+  * `lab/4` Input data validation
+  * `lab/5` HTTP security related headers
+  * `lab/6` Refactor into domain application layer
+  
+To checkout a branch, you can run the git `checkout` command, for
+example: `git checkout lab/4` to checkout the branch for the input
+data validation.
 
 ## Run the code
 
 To run the sample, open two terminal windows.  In the first, start the
-token service:
+identity service:
 
 ```shell
 cd IdentityService
-dotnet run 
+dotnet run --server.urls=http://localhost:4000
 ```
 
-Note the host and port where the identity service starts (we will
-assume http://localhost:4000 for the rest of these instructions).
-Update the Authority URL in class Startup to point to your identity
-service.  In the second terminal, start the products service.
+If you choose a different port than 4000, you will need to update the
+Authority URL in class Startup to point to your identity service.  In
+the second terminal, start the products service:
 
 ```shell
 cd ProductsService
-dotnet run
+dotnet run --server.urls=http://localhost:5000
 ```
-
-Note the host and port where the products service starts (we will
-assume http://localhost:4000 for the rest of these instructions).
 
 You can now first verify that you will get a 401 from the products
 service:
@@ -54,3 +59,25 @@ And use the returned access token on the products endpoint:
 GET http://localhost:5000/products HTTP/1.1
 Authorization: bearer <paste your access token here>
 ```
+
+## Miscellaneous
+
+The folder `IdentityService` contains a service built on the
+[IdentityServer][3] NuGet package, which we feel is the de-facto
+standard for building your own identity service.
+
+The folder `TokenService` contains an extremely basic identity service
+built from scratch.  We include it just as a sample of how you can
+create and sign your own JWT tokens, which you might find to be
+illuminating for understanding JWT tokens.
+
+We can select the port using command line argument `--server.urls`
+aboce since we use [AddCommandLine][1] in class `Program`.
+
+There are many ways to execute an HTTP query.  For example, you can
+use Postman, Powershell, curl.  These days, we tend to prefer the
+Visual Studio Code extension [rest-client][2].
+
+[1]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?tabs=basicconfiguration#commandline-configuration-provider
+[2]: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+[3]: https://github.com/IdentityServer/IdentityServer4
