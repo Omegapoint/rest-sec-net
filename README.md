@@ -37,6 +37,11 @@ cd ProductsService
 dotnet run --server.urls=http://localhost:5000
 ```
 
+If you are running the services from an IDE, like Visual Studio for
+Windows, instead of from a terminal, you need to configure the ports
+in that IDE.  Each IDE works a little differently, but Google is
+probably your friend.
+
 You can now first verify that you will get a 401 from the products
 service:
 
