@@ -26,6 +26,8 @@ namespace TokenService
 
             var claims = new []
             {
+                new Claim("client_id", "unknown"),
+                new Claim("scope", "read:product"), 
                 new Claim(ClaimTypes.Name, "Martin Altenstedt"),
                 new Claim("urn:omegapoint:age", "49")
             };

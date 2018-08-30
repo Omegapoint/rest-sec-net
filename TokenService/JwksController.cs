@@ -18,6 +18,7 @@ namespace TokenService
             this.certificateStore = certificateStore;
         }
 
+        [HttpGet]
         public IActionResult GetAllCertificates()
         {
             var result = new List<JwkDataContract>();
@@ -50,41 +51,7 @@ namespace TokenService
         }
     }
 
-    // https://tools.ietf.org/html/rfc7517
-    [DataContract]
-    public class JwkDataContract
-    {
-        [DataMember(Name="kty")]
-        public string KeyType { get; set; }
-
-        [DataMember(Name="use")]
-        public string PublicKeyUse { get; set; }
-
-        [DataMember(Name="kid")]
-        public string KeyId { get; set; }
-
-        [DataMember(Name="x5t")]
-        public string X509Thumbprint { get; set; }
-
-        [DataMember(Name="e")]
-        public string Exponent { get; set; }
-
-        [DataMember(Name="n")]
-        public string Modulus { get; set; }
-
-        [DataMember(Name="Alg")]
-        public string Algorithm { get; set; }        
-    }
-
-    // https://tools.ietf.org/html/rfc7517#section-5
-    [DataContract]
-    public class JwksDataContract
-    {
-        [DataMember(Name="keys")]
-        public IEnumerable<JwkDataContract> Keys { get; set; }
-    }
-
-    public static class Base64Extensions
+    internal static class Base64Extensions
     {
         public static string ToBase64UrlSafeString(this byte[] bytes) 
         {

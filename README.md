@@ -71,17 +71,56 @@ The folder `IdentityService` contains a service built on the
 [IdentityServer][3] NuGet package, which we feel is the de-facto
 standard for building your own identity service.
 
-The folder `TokenService` contains an extremely basic identity service
-built from scratch.  We include it just as a sample of how you can
-create and sign your own JWT tokens, which you might find to be
-illuminating for understanding JWT tokens.
-
 We can select the port using command line argument `--server.urls`
-aboce since we use [AddCommandLine][1] in class `Program`.
+above since we use [AddCommandLine][1] in class `Program`.
 
 There are many ways to execute an HTTP query.  For example, you can
 use Postman, Powershell, curl.  These days, we tend to prefer the
 Visual Studio Code extension [rest-client][2].
+
+## The Token Service project
+
+The folder `TokenService` contains an extremely basic identity service
+built from scratch.  We include it just as a sample of how you can
+create and sign your own JWT tokens, which you might find to be
+illuminating for understanding JWT tokens.  The service use a
+certificate to sign JWT tokens, and the code assumes that it is has a
+Subject (Distinguished Name) of "REST Sec OAuth2 Identity" and is
+placed in store CurrentUser.
+
+On Windows, you can create a signing certificate using the following
+PowerShell command:
+
+```powershell
+New-SelfSignedCertificate `
+  -CertStoreLocation cert:\currentuser\my `
+  -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider" `
+  -Subject "CN=REST Sec OAuth2 Identity" `
+  -FriendlyName "OAuth2 token signing for REST Sec course" `
+  -Type CodeSigningCert `
+  -KeyExportPolicy Exportable `
+  -KeyLength 4096 `
+  -NotAfter (Get-Date).AddYears(1) `
+  -HashAlgorithm SHA256
+```
+
+To run the token service, open a terminal windows:
+
+```shell
+cd TokenService
+dotnet run --server.urls=http://localhost:4001
+```
+
+Get a token from the token service:
+
+```http
+POST http://localhost:4001/token
+```
+
+If you want to the product service to use this token, you can use
+branch `feature/token-service` and see how you would make changes in
+class `Startup` and use the JWKs endpoint to get the token signing
+keys.
 
 [1]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?tabs=basicconfiguration#commandline-configuration-provider
 [2]: https://marketplace.visualstudio.com/items?itemName=humao.rest-client

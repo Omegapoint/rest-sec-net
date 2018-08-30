@@ -12,7 +12,7 @@ namespace TokenService
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly);
 
-            var subjectDistinguishedName = "CN=My OAuth2 Identity";
+            var subjectDistinguishedName = "CN=REST Sec OAuth2 Identity";
 
             try 
             {
