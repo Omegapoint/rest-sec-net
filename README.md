@@ -1,127 +1,97 @@
 What is this?
 -------------
 
-This presentation holds the source code for the course on secure REST
-API in ASP.NET Core, in C#.
+This folder holds the source code for the Omegapoint course on secure
+REST API in ASP.NET Core, in C#.
 
-There are a number of branches, each representing the different labs
-that comprise the course:
+There are a number of labs, organized in different folders under `labs`:
 
-  * `lab/1` Authentication & Authorization
-  * `lab/2` Error handling
-  * `lab/3` Test driven development
-  * `lab/4` Input data validation
-  * `lab/5` HTTP security related headers
-  * `lab/6` Refactor into domain application layer
-  
-To checkout a branch, you can run the git `checkout` command, for
-example: `git checkout lab/4` to checkout the branch for the input
-data validation.
+  * `1-auth`       Authentication & Authorization
+  * `2-errors`     Error handling
+  * `3-tdd`        Test driven development
+  * `4-validation` Input data validation
+  * `5-headers`    HTTP security related headers
+  * `6-secdesign`  Refactor into domain application layer
 
-## Run the code
+Each folder has a README.md file that contains instructions for the lab.
 
-To run the sample, open two terminal windows.  In the first, start the
-identity service:
+## Run the identity provider
 
-```shell
-cd IdentityService
-dotnet run --server.urls=http://localhost:4000
+All of the labs require an IdP that provides the tokens we need to
+secure the system we are building.
+
+The folder `IdentityServer` contains a default implementation of an
+identity provider, based on IdentityServer4.  It is created from the
+"in memory" base template, and very slightly adjusted for our needs.
+
+IdentityServer4 is a very capable identity provider, and you can read
+a lot more, including samples and getting started guides here:
+
+https://identityserver.io/
+
+You can start the identity provider by stepping into the
+`IdentityServer` folder and run the following command:
+
+```sh
+dotnet run --urls=http://localhost:5000
 ```
 
-If you choose a different port than 4000, you will need to update the
-Authority URL in class Startup to point to your identity service.  In
-the second terminal, start the products service:
+If you prefer, you can instead use the provided Docker file:
 
-```shell
-cd ProductsService
-dotnet run --server.urls=http://localhost:5000
+Build the docker image for identity server:
+
+```sh
+docker build -t identityserver .
 ```
 
-If you are running the services from an IDE, like Visual Studio for
-Windows, instead of from a terminal, you need to configure the ports
-in that IDE.  Each IDE works a little differently, but Google is
-probably your friend.
+Run the docker image:
 
-You can now first verify that you will get a 401 from the products
-service:
-
-```
-GET http://localhost:5000/products HTTP/1.1
+```sh
+docker run -it --rm -p 5000:5000 -t identityserver
 ```
 
-Get an access token from the token endpoint:
+You can connect a shell to the image, if you want to inspect the
+contents, by running a shell from a specified entrypoint:
+
+```sh
+docker run -it --rm --entrypoint sh identityserver
+```
+
+Either way, you can verify that you have a running identity provider
+by querying the discovery document:
+
+```sh
+curl http://localhost:5000/.well-known/openid-configuration
+```
+
+You can also get an access token using the client credentials flow:
 
 ```
-POST http://localhost:4000/connect/token
+POST http://localhost:5000/connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id=myclient&client_secret=secret&scope=read:product&grant_type=client_credentials
+client_id=client&client_secret=secret&scopes=products.read&grant_type=client_credentials
 ```
 
-And use the returned access token on the products endpoint:
+## Create APIs
+
+We have use the `dotnet new` command to create all of the samples.  We
+typically use `dotnet new empty` and build out from there, but you can
+use `dotnet new webapi` as well.  There are many templates to choose
+from, and they tend to change between major releases of .NET, so have
+a look yourself by just running the `dotnet new` command.
+
+To be able to use the `JwtBearerDefaults` class, you need to import
+the `Microsoft.AspNetCore.Authentication.JwtBearer` NuGet package:
 
 ```
-GET http://localhost:5000/products HTTP/1.1
-Authorization: bearer <paste your access token here>
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 ```
 
-## Miscellaneous
+# Run an HTTP request
 
-The folder `IdentityService` contains a service built on the
-[IdentityServer][3] NuGet package, which we feel is the de-facto
-standard for building your own identity service.
+There are many ways to execute an HTTP request.  For example, you can
+use Postman, Powershell, curl, Insomnia etc.  These days, we tend to
+prefer the [rest-client][1] Visual Studio Code extension.
 
-We can select the port using command line argument `--server.urls`
-above since we use [AddCommandLine][1] in class `Program`.
-
-There are many ways to execute an HTTP query.  For example, you can
-use Postman, Powershell, curl.  These days, we tend to prefer the
-Visual Studio Code extension [rest-client][2].
-
-## The Token Service project
-
-The folder `TokenService` contains an extremely basic identity service
-built from scratch.  We include it just as a sample of how you can
-create and sign your own JWT tokens, which you might find to be
-illuminating for understanding JWT tokens.  The service use a
-certificate to sign JWT tokens, and the code assumes that it is has a
-Subject (Distinguished Name) of "REST Sec OAuth2 Identity" and is
-placed in store CurrentUser.
-
-On Windows, you can create a signing certificate using the following
-PowerShell command:
-
-```powershell
-New-SelfSignedCertificate `
-  -CertStoreLocation cert:\currentuser\my `
-  -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider" `
-  -Subject "CN=REST Sec OAuth2 Identity" `
-  -FriendlyName "OAuth2 token signing for REST Sec course" `
-  -Type CodeSigningCert `
-  -KeyExportPolicy Exportable `
-  -KeyLength 4096 `
-  -NotAfter (Get-Date).AddYears(1) `
-  -HashAlgorithm SHA256
-```
-
-To run the token service, open a terminal windows:
-
-```shell
-cd TokenService
-dotnet run --server.urls=http://localhost:4001
-```
-
-Get a token from the token service:
-
-```http
-POST http://localhost:4001/token
-```
-
-If you want to the product service to use this token, you can use
-branch `feature/token-service` and see how you would make changes in
-class `Startup` and use the JWKs endpoint to get the token signing
-keys.
-
-[1]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?tabs=basicconfiguration#commandline-configuration-provider
-[2]: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
-[3]: https://github.com/IdentityServer/IdentityServer4
+[1]: https://github.com/Huachao/vscode-restclient

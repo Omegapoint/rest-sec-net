@@ -1,0 +1,16 @@
+TOPIC
+    about_securebydesign
+
+SHORT DESCRIPTION
+
+    Module SecureByDesign provides a set of CmdLets.
+
+LONG DESCRIPTION
+
+    You can list all the CmdLets that are available in this module by
+    using the following command:
+
+      Get-Command -Module SecureByDesign
+
+KEYWORDS
+    Secure, Design, Demo, Omegapoint

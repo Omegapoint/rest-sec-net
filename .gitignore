@@ -3,9 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+requests.http
+
 # IdentityServer creates a local file if you use developer signing
 # credentials, which we sometimes do.
 tempkey.rsa
+
+identityserver4_log.txt
 
 .vscode/
 
