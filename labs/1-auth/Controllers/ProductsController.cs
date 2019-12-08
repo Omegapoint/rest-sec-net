@@ -16,11 +16,6 @@ namespace Sample.Controllers
         {
             var product = new Product(); // Repository
 
-            if (!product.CanRead(User))
-            {
-                return BadRequest();
-            }
-
             return Ok(product);
         }
     }
@@ -28,10 +23,18 @@ namespace Sample.Controllers
     public class Product
     {
         public string Name => "My Product";
+    }    
+}
+
+/*
+        if (!product.CanRead(User))
+        {
+            return Forbid();
+        }
 
         public bool CanRead(ClaimsPrincipal principal)
         {
             return principal.HasClaim(c => c.Type == "urn:local:product:read" && c.Value == "true");
         }
-    }    
-}
+
+*/
