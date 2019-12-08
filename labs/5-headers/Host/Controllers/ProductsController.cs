@@ -8,7 +8,7 @@ namespace Headers.Host.Controllers
     {
         private readonly Repository repository = new Repository();
 
-        [HttpGet]
+        [HttpGet("{id}")]
         public ActionResult<Product> GetById(string id)
         {
             if (!ProductId.IsValidId(id))

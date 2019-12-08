@@ -13,7 +13,7 @@ namespace SecureByDesign.Host.Controllers
             this.productsService = productsService;
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         public ActionResult<Product> GetById(string id)
         {
             if (!ProductId.IsValidId(id))

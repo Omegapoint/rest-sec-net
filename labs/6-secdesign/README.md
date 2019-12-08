@@ -34,7 +34,7 @@ client_id=client&client_secret=secret&scope=products.read&grant_type=client_cred
 And use the returned access token on the products endpoint:
 
 ```
-GET http://localhost:5001/api/products?id=abc
+GET http://localhost:5001/api/products/abc
 Authorization: bearer <paste your access token here>
 ```
 

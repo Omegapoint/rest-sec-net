@@ -24,7 +24,7 @@ your friend.
 Verify that you get a 500 response from the error resource:
 
 ```
-GET http://localhost:5001/error
+PUT http://localhost:5001/api/error
 ```
 
 If you enable the developer exception page, you will get a lot of

@@ -9,10 +9,10 @@ namespace Tdd.Host.Controllers
     [Route("/api/products")]
     public class ProductsController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public ActionResult<Product> Get()
+        public ActionResult<Product> GetById(string id)
         {
             var product = new Product(); // Repository
 

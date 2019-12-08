@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Errors.Controllers
     public class ErrorController : ControllerBase
     {
         [AllowAnonymous]
-        [HttpGet]
+        [HttpPut]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult Get()
+        public IActionResult Throw()
         {
             throw new InvalidOperationException("This message might contain sensitive information.");
         }
