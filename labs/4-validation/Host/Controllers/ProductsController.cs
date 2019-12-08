@@ -3,7 +3,7 @@
 namespace Validation.Host.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/products")]
     public class ProductsController : ControllerBase
     {
         private readonly Repository repository = new Repository();

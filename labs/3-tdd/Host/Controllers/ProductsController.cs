@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Tdd.Host.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/products")]
     public class ProductsController : ControllerBase
     {
         [HttpGet]

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace SecureByDesign.Host.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/products")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductsService productsService;

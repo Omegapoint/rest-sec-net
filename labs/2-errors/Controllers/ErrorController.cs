@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Errors.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/error")]
     public class ErrorController : ControllerBase
     {
         [AllowAnonymous]
