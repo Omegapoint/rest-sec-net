@@ -15,7 +15,7 @@ namespace Headers.Host
 
         public bool CanRead(ClaimsPrincipal principal)
         {
-            return principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("read:product"));
+            return principal.HasClaim(c => c.Type == "urn:local:product:read" && c.Value == "true");
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Tdd.Host.Controllers
 
         public bool CanRead(ClaimsPrincipal principal)
         {
-            return principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("products.read"));
+            return principal.HasClaim(c => c.Type == "urn:local:product:read" && c.Value == "true");
         }
     }    
 }

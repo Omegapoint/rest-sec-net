@@ -19,17 +19,25 @@ namespace Validation.Host
                 // account database to get information about what organization and
                 // local permissions to add.
 
-                // Transform scope and identity to local claims, for example:
-                identity.AddClaim(new Claim("urn:local:organization:id", "42"));
+                // It is important to honor any scope that affect our domain
+                AddClaimIfScope(identity, "products.read",  new Claim("urn:local:product:read",  "true"));
+                AddClaimIfScope(identity, "products.write", new Claim("urn:local:product:write", "true"));
 
-                // Lookup local permissions
-                identity.AddClaim(new Claim("urn:local:permission:a", "true"));
-                identity.AddClaim(new Claim("urn:local:permission:b", "true"));
+                // Example claim that is not affected by scope
+                identity.AddClaim(new Claim("urn:local:organization:id", "42"));
 
                 return new ClaimsPrincipal(identity);
             }
 
             return principal;
+        }
+
+        private void AddClaimIfScope(ClaimsIdentity identity, string scope, Claim claim)
+        {
+            if (identity.Claims.Any(c => c.Type == "scope" && c.Value == scope))
+            {
+                identity.AddClaim(claim);
+            }
         }
     }
 }
