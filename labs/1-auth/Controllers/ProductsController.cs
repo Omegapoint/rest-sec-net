@@ -18,7 +18,7 @@ namespace Sample.Controllers
 
             if (!product.CanRead(User))
             {
-                return Forbid();
+                return BadRequest();
             }
 
             return Ok(product);
