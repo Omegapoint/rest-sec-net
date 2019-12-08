@@ -70,7 +70,7 @@ You can also get an access token using the client credentials flow:
 POST http://localhost:5000/connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id=client&client_secret=secret&scopes=products.read&grant_type=client_credentials
+client_id=client&client_secret=secret&scope=products.read&grant_type=client_credentials
 ```
 
 ## Create APIs
