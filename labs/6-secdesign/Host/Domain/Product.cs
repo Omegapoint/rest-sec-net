@@ -1,4 +1,4 @@
-namespace SecureByDesign.Host
+namespace SecureByDesign.Host.Domain
 {
     public class Product
     {

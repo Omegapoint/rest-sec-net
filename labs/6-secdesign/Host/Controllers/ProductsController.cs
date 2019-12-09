@@ -1,4 +1,7 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SecureByDesign.Host.Application;
+using SecureByDesign.Host.Domain;
 
 namespace SecureByDesign.Host.Controllers
 {
@@ -14,7 +17,7 @@ namespace SecureByDesign.Host.Controllers
         }
 
         [HttpGet]
-        public ActionResult<Product> GetById(string id)
+        public async Task<ActionResult<Product>> GetById(string id)
         {
             if (!ProductId.IsValidId(id))
             {
@@ -23,7 +26,7 @@ namespace SecureByDesign.Host.Controllers
 
             var productId = new ProductId(id);
 
-            var productResult = productsService.GetById(User, productId);
+            var productResult = await productsService.GetById(User, productId);
 
             if (productResult.Result == ServiceResult.NotFound)
             {

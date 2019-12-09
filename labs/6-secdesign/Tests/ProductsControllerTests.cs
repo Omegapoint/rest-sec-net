@@ -5,6 +5,9 @@ using SecureByDesign.Host.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Moq;
+using SecureByDesign.Host.Application;
+using SecureByDesign.Host.Domain;
+using System.Threading.Tasks;
 
 namespace Tests
 {
@@ -15,7 +18,7 @@ namespace Tests
         public void GetProductsByIdShouldReturn403WhenCanNotRead()
         {
             var productServiceMock = new Mock<IProductsService>();
-            productServiceMock.Setup(ps => ps.GetById(It.IsAny<IPrincipal>(), It.IsAny<ProductId>())).Returns(new ProductResult(ServiceResult.Forbidden, null));
+            productServiceMock.Setup(ps => ps.GetById(It.IsAny<IPrincipal>(), It.IsAny<ProductId>())).Returns(Task.FromResult(new ProductResult(ServiceResult.Forbidden, null)));
 
             var controller = new ProductsController(productServiceMock.Object);
 
@@ -28,7 +31,7 @@ namespace Tests
         public void GetProductsByIdShouldReturn200WhenAuthorized()
         {
             var productServiceMock = new Mock<IProductsService>();
-            productServiceMock.Setup(ps => ps.GetById(It.IsAny<IPrincipal>(), It.IsAny<ProductId>())).Returns(new ProductResult(ServiceResult.Ok, new Product(new ProductId("abc"))));
+            productServiceMock.Setup(ps => ps.GetById(It.IsAny<IPrincipal>(), It.IsAny<ProductId>())).Returns(Task.FromResult(new ProductResult(ServiceResult.Ok, new Product(new ProductId("abc")))));
 
             var controller = new ProductsController(productServiceMock.Object);
 
@@ -43,7 +46,7 @@ namespace Tests
         public void GetProductsByIdShouldReturn400WhenInvalidId(string id)
         {
             var productServiceMock = new Mock<IProductsService>();
-            productServiceMock.Setup(ps => ps.GetById(It.IsAny<IPrincipal>(), It.IsAny<ProductId>())).Returns(new ProductResult(ServiceResult.Ok, new Product(new ProductId("abc"))));
+            productServiceMock.Setup(ps => ps.GetById(It.IsAny<IPrincipal>(), It.IsAny<ProductId>())).Returns(Task.FromResult(new ProductResult(ServiceResult.Ok, new Product(new ProductId("abc")))));
 
             var controller = new ProductsController(productServiceMock.Object);
 
@@ -56,7 +59,7 @@ namespace Tests
         public void GetProductsByIdShouldReturn404WhenNotFound()
         {
             var productServiceMock = new Mock<IProductsService>();
-            productServiceMock.Setup(ps => ps.GetById(It.IsAny<IPrincipal>(), It.IsAny<ProductId>())).Returns(new ProductResult(ServiceResult.NotFound, null));
+            productServiceMock.Setup(ps => ps.GetById(It.IsAny<IPrincipal>(), It.IsAny<ProductId>())).Returns(Task.FromResult(new ProductResult(ServiceResult.NotFound, null)));
             
             var controller = new ProductsController(productServiceMock.Object);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SecureByDesign.Host;
+using SecureByDesign.Host.Domain;
 using Xunit;
 
 namespace Tests

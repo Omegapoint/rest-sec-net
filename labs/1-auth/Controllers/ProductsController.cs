@@ -6,32 +6,32 @@ using Microsoft.Extensions.Logging;
 namespace Sample.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("products")]
     public class ProductsController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("{id:string}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public ActionResult<Product> Get()
+        public ActionResult<Product> GetById([FromRoute] string id)
         {
-            var product = new Product(); // Repository
-
-            if (!product.CanRead(User))
+            if (!HasProductReadAccess(User))
             {
-                return Forbid();
+                return StatusCode(403);
             }
 
+            var product = new Product(); // Get from repository
+
             return Ok(product);
+        }
+
+        private bool HasProductReadAccess(ClaimsPrincipal principal)
+        {
+            return principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("products.read"));
         }
     }
 
     public class Product
     {
-        public string Name => "My Product";
-
-        public bool CanRead(ClaimsPrincipal principal)
-        {
-            return principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("products.read"));
-        }
+        public string Name => "My Product";  
     }    
 }

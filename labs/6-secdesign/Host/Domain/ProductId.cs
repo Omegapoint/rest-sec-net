@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace SecureByDesign.Host
+namespace SecureByDesign.Host.Domain
 {
     public class ProductId
     {
@@ -23,7 +23,7 @@ namespace SecureByDesign.Host
         {
             if (!IsValidId(id))
             {
-                throw new ArgumentException($"Id {id} is not valid.");
+                throw new InvalidProductIdArgumentException($"Id {id} is not valid.");
             }
         }
 
