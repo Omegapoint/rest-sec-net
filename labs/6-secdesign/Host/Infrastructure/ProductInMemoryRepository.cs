@@ -18,7 +18,7 @@ namespace SecureByDesign.Host.Infrastructure
         {
             var result = products.GetValueOrDefault(id.Value);
 
-            return new Product(new ProductId(result.Id), new ProductName(result.Name));
+            return result == null ? null : new Product(new ProductId(result.Id), new ProductName(result.Name));
         }
 
         public List<Product> SearchById(SearchTerm term)

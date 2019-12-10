@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -8,7 +9,7 @@ namespace SecureByDesign.Host
     {
         public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
         {
-            await Task.Delay(0);
+            await Task.CompletedTask;
 
             if (principal.Identity.IsAuthenticated)
             {
@@ -19,19 +20,25 @@ namespace SecureByDesign.Host
                 // account database to get information about what organization and
                 // local permissions to add.
 
-                // Transform scope and identity to local claims, for example:
-                identity.AddClaim(new Claim("urn:local:organization:id", "42"));
+                // It is important to honor any scope that affect our domain
+                AddClaimIfScope(identity, "products.read",  new Claim(ClaimSettings.UrnLocalProductRead,  "true"));
+                AddClaimIfScope(identity, "products.write", new Claim(ClaimSettings.UrnLocalProductWrite, "true"));
 
-                // Lookup local permissions
-                identity.AddClaim(new Claim("urn:local:permission:a", "true"));
-                identity.AddClaim(new Claim("urn:local:permission:b", "true"));
-
+                // Example claim that is not affected by scope, typically lookup from permission configuration data
                 identity.AddClaim(new Claim(ClaimSettings.UrnLocalProductIds, "abc,def"));
 
                 return new ClaimsPrincipal(identity);
             }
 
             return principal;
+        }
+
+        private void AddClaimIfScope(ClaimsIdentity identity, string scope, Claim claim)
+        {
+            if (identity.Claims.Any(c => c.Type == "scope" && c.Value == scope))
+            {
+                identity.AddClaim(claim);
+            }
         }
     }
 }

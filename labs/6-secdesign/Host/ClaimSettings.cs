@@ -2,17 +2,14 @@
 {
     public static class ClaimSettings
     {
-        //Token attributes
-        public const string Scope = "scope";
-
-        //Local claim types
-        public const string UrnLocalUsername = "urn:local:username";
-        public const string UrnLocalProductIds = "urn:local:product:ids";
-
-        //Permissions
+        //Authorization server scopes
         public const string ProductsRead = "products.read";
         public const string ProductsWrite = "products.write";
-    }
 
+        //Local permission claim types
+        public const string UrnLocalProductRead = "urn:local:product:read";
+        public const string UrnLocalProductWrite = "urn:local:product:write";
+        public const string UrnLocalProductIds = "urn:local:product:ids";  
+    }
 }
 

@@ -26,6 +26,7 @@ namespace SecureByDesign.Host
             services.AddSingleton<IClaimsTransformation, ClaimsTransformation>();
             services.AddScoped<IProductsService, ProductsService>();
             services.AddScoped<IProductsRepository, ProductsInMemoryRepository>();
+            services.AddScoped<ILoggingService, CentralizedLoggingService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
@@ -37,9 +38,10 @@ namespace SecureByDesign.Host
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseHttpsRedirection();
             app.UseHsts();
             
+            app.UseHeaders();
+
             app.UseRouting();
 
             app.UseAuthentication();

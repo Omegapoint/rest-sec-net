@@ -11,11 +11,11 @@ namespace Tests
     public class ProductsServiceTests
     {
         [Fact]
-        public async void GetById_ReturnsForbidden_IfNoValidScopeClaim()
+        public async void GetById_ReturnsForbidden_IfNoValidReadClaim()
         {
             var claims = new[]
             {
-                new Claim(ClaimSettings.Scope, "not a valid scope"),
+                new Claim("not valid read claim", "true"),
                 new Claim(ClaimSettings.UrnLocalProductIds, "abc"),
             };
             var identity = new ClaimsIdentity(claims);
@@ -33,7 +33,7 @@ namespace Tests
         {
             var claims = new[]
             {
-                new Claim(ClaimSettings.Scope, ClaimSettings.ProductsRead),
+                new Claim(ClaimSettings.UrnLocalProductRead, "true"),
                 new Claim(ClaimSettings.UrnLocalProductIds, "abc"),
             };
             var identity = new ClaimsIdentity(claims);
@@ -41,6 +41,24 @@ namespace Tests
             var product = new ProductsService(new ProductsInMemoryRepository(), new CentralizedLoggingService());
 
             var result = await product.GetById(principal, new ProductId("def"));
+
+            Assert.Equal(ServiceResult.Forbidden, result.Result);
+            Assert.Null(result.Value);
+        }
+
+        [Fact]
+        public async void GetById_ReturnsForbidden_IfNoValidProductIdClaimInLIst()
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimSettings.UrnLocalProductRead, "true"),
+                new Claim(ClaimSettings.UrnLocalProductIds, "abc,def"),
+            };
+            var identity = new ClaimsIdentity(claims);
+            var principal = new ClaimsPrincipal(identity);
+            var product = new ProductsService(new ProductsInMemoryRepository(), new CentralizedLoggingService());
+
+            var result = await product.GetById(principal, new ProductId("ghi"));
 
             Assert.Equal(ServiceResult.Forbidden, result.Result);
             Assert.Null(result.Value);
@@ -55,7 +73,7 @@ namespace Tests
         {
             var claims = new[]
             {
-                new Claim(ClaimSettings.Scope, ClaimSettings.ProductsRead),
+                new Claim(ClaimSettings.UrnLocalProductRead, "true"),
                 new Claim(ClaimSettings.UrnLocalProductIds, "abc"),
             };
             var identity = new ClaimsIdentity(claims);
@@ -73,7 +91,7 @@ namespace Tests
         {
             var claims = new[]
             {
-                new Claim(ClaimSettings.Scope, ClaimSettings.ProductsRead),
+                new Claim(ClaimSettings.UrnLocalProductRead, "true"),
                 new Claim(ClaimSettings.UrnLocalProductIds, "xyz"),
             };
             var identity = new ClaimsIdentity(claims);

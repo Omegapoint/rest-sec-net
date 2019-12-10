@@ -57,8 +57,9 @@ namespace SecureByDesign.Host.Domain.Services
                 return new ProductListResult(ServiceResult.NotFound, null);
             }
 
+            // If search, and multiple products are returned, then we need to check that all result items are allowed 
+            // (or remove from search result) 
             var productIds = string.Join(',', products.Select(p => p.Id.Value));
-            // If search, and multiple products are returned, then we need to check that all result items are allowed (or remove from search result) 
             if (!CanAccessList((ClaimsPrincipal)principal, products))
             {
                 await _logger.Log(principal.Identity.Name, $"Audit: Unauthorized - no access to product resources from search {idTerm.Value}");
@@ -70,22 +71,26 @@ namespace SecureByDesign.Host.Domain.Services
         }
 
         private static bool CanRead(ClaimsPrincipal claimsPrincipal){
-            return claimsPrincipal.HasClaim(c => string.Equals(c.Type, ClaimSettings.ProductsRead, StringComparison.Ordinal));
+            return claimsPrincipal.HasClaim(c => string.Equals(c.Type, ClaimSettings.UrnLocalProductRead, StringComparison.Ordinal));
         }
 
-        private static bool CanAccess(ClaimsPrincipal claimsPrincipal, ProductId id){
-            return claimsPrincipal.HasClaim(c => 
-                string.Equals(c.Type, ClaimSettings.UrnLocalProductIds, StringComparison.Ordinal) && 
-                string.Equals(c.Value, id.Value, StringComparison.Ordinal));
-        }
-
-        private static bool CanAccessList(ClaimsPrincipal claimsPrincipal, List<Product> products){
+        private static bool CanAccess(ClaimsPrincipal claimsPrincipal, ProductId requestedProductId){
             if(!claimsPrincipal.HasClaim(c => string.Equals(c.Type, ClaimSettings.UrnLocalProductIds, StringComparison.Ordinal))){
                 return false;
             }
             
-            var valueList = claimsPrincipal.FindFirstValue(ClaimSettings.UrnLocalProductIds).Split(',', StringSplitOptions.RemoveEmptyEntries);
-            return products.All(p => valueList.Any(s => string.Equals(p.Id.Value, s, StringComparison.Ordinal)));
+            var grantedProductIds = claimsPrincipal.FindFirstValue(ClaimSettings.UrnLocalProductIds).Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            return grantedProductIds.Any(s => string.Equals(requestedProductId.Value, s, StringComparison.Ordinal));
+        }
+
+        private static bool CanAccessList(ClaimsPrincipal claimsPrincipal, List<Product> requestedProducts){
+            if(!claimsPrincipal.HasClaim(c => string.Equals(c.Type, ClaimSettings.UrnLocalProductIds, StringComparison.Ordinal))){
+                return false;
+            }
+            
+            var grantedProductIds = claimsPrincipal.FindFirstValue(ClaimSettings.UrnLocalProductIds).Split(',', StringSplitOptions.RemoveEmptyEntries);
+            return requestedProducts.All(p => grantedProductIds.Any(s => string.Equals(p.Id.Value, s, StringComparison.Ordinal)));
         }
     }
 }
