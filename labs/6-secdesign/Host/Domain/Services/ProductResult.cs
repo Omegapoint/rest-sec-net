@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using SecureByDesign.Host.Domain;
+using SecureByDesign.Host.Domain.Model;
 
-namespace SecureByDesign.Host.Application
+namespace SecureByDesign.Host.Domain.Services
 {
     public class ProductResult
     {

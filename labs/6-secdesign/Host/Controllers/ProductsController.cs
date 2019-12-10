@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SecureByDesign.Host.Application;
-using SecureByDesign.Host.Domain;
+using SecureByDesign.Host.Domain.Model;
+using SecureByDesign.Host.Domain.Services;
 
 namespace SecureByDesign.Host.Controllers
 {
@@ -17,7 +17,7 @@ namespace SecureByDesign.Host.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Product>> GetById(string id)
+        public async Task<ActionResult<ProductResponseModel>> GetById(string id)
         {
             if (!ProductId.IsValidId(id))
             {
@@ -38,7 +38,7 @@ namespace SecureByDesign.Host.Controllers
                 return Forbid();
             }
 
-            return Ok(productResult.Value);
+            return Ok(productResult.Value.MapToProductResponseModel());
         }
     }
 }

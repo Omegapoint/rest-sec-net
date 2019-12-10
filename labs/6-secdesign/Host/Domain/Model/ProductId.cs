@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace SecureByDesign.Host.Domain
+namespace SecureByDesign.Host.Domain.Model
 {
     public class ProductId
     {

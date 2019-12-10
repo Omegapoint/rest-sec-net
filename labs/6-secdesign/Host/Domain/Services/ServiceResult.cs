@@ -1,4 +1,4 @@
-namespace SecureByDesign.Host.Application
+namespace SecureByDesign.Host.Domain.Services
 {
     public enum ServiceResult
     {

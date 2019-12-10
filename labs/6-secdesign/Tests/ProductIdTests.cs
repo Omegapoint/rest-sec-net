@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SecureByDesign.Host;
 using SecureByDesign.Host.Domain;
+using SecureByDesign.Host.Domain.Model;
 using Xunit;
 
 namespace Tests
@@ -22,7 +23,7 @@ namespace Tests
         [MemberData(nameof(InvalidIds))]
         public void ProductIdConstructorShouldThrow(string id)
         {
-            Assert.Throws<ArgumentException>(() => new ProductId(id));
+            Assert.Throws<InvalidProductIdArgumentException>(() => new ProductId(id));
         }
 
         [Theory]

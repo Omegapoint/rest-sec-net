@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using SecureByDesign.Host.Application;
+using SecureByDesign.Host.Domain.Services;
 
 namespace SecureByDesign.Host.Infrastructure
 {

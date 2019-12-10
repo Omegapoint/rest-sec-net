@@ -4,10 +4,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using SecureByDesign.Host.Domain;
-using SecureByDesign.Host.Domain.Services;
+using SecureByDesign.Host.Domain.Model;
 
-namespace SecureByDesign.Host.Application
+namespace SecureByDesign.Host.Domain.Services
 {
     public class ProductsService : IProductsService
     {

@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using SecureByDesign.Host;
-using SecureByDesign.Host.Application;
-using SecureByDesign.Host.Domain;
+using SecureByDesign.Host.Domain.Model;
+using SecureByDesign.Host.Domain.Services;
 using SecureByDesign.Host.Infrastructure;
 using Xunit;
 

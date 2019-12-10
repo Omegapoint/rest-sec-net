@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace SecureByDesign.Host.Application
+namespace SecureByDesign.Host.Domain.Services
 {
     public interface ILoggingService
     {

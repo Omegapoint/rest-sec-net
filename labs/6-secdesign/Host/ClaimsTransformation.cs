@@ -19,7 +19,13 @@ namespace SecureByDesign.Host
                 // account database to get information about what organization and
                 // local permissions to add.
 
-                // Transform scope and identity to local permissions, also represented as claims, for example:
+                // Transform scope and identity to local claims, for example:
+                identity.AddClaim(new Claim("urn:local:organization:id", "42"));
+
+                // Lookup local permissions
+                identity.AddClaim(new Claim("urn:local:permission:a", "true"));
+                identity.AddClaim(new Claim("urn:local:permission:b", "true"));
+
                 identity.AddClaim(new Claim(ClaimSettings.UrnLocalProductIds, "abc,def"));
 
                 return new ClaimsPrincipal(identity);

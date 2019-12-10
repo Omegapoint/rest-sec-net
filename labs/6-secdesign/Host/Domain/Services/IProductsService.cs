@@ -1,8 +1,8 @@
 using System.Security.Principal;
 using System.Threading.Tasks;
-using SecureByDesign.Host.Domain;
+using SecureByDesign.Host.Domain.Model;
 
-namespace SecureByDesign.Host.Application
+namespace SecureByDesign.Host.Domain.Services
 {
     public interface IProductsService
     {

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
-using SecureByDesign.Host.Application;
 using SecureByDesign.Host.Domain.Services;
 using SecureByDesign.Host.Infrastructure;
 
