@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using SecureByDesign.Host.Domain.Services;
+using SecureByDesign.Host.Infrastructure;
 
 namespace SecureByDesign.Host
 {
@@ -23,6 +25,8 @@ namespace SecureByDesign.Host
 
             services.AddSingleton<IClaimsTransformation, ClaimsTransformation>();
             services.AddScoped<IProductsService, ProductsService>();
+            services.AddScoped<IProductsRepository, ProductsInMemoryRepository>();
+            services.AddScoped<ILoggingService, CentralizedLoggingService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
@@ -34,6 +38,10 @@ namespace SecureByDesign.Host
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseHsts();
+            
+            app.UseHeaders();
+
             app.UseRouting();
 
             app.UseAuthentication();

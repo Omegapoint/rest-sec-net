@@ -1,4 +1,7 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SecureByDesign.Host.Domain.Model;
+using SecureByDesign.Host.Domain.Services;
 
 namespace SecureByDesign.Host.Controllers
 {
@@ -14,7 +17,7 @@ namespace SecureByDesign.Host.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Product> GetById(string id)
+        public async Task<ActionResult<ProductResponseModel>> GetById(string id)
         {
             if (!ProductId.IsValidId(id))
             {
@@ -23,7 +26,7 @@ namespace SecureByDesign.Host.Controllers
 
             var productId = new ProductId(id);
 
-            var productResult = productsService.GetById(User, productId);
+            var productResult = await productsService.GetById(User, productId);
 
             if (productResult.Result == ServiceResult.NotFound)
             {
@@ -35,7 +38,7 @@ namespace SecureByDesign.Host.Controllers
                 return Forbid();
             }
 
-            return Ok(productResult.Value);
+            return Ok(productResult.Value.MapToProductResponseModel());
         }
     }
 }

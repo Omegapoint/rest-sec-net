@@ -14,7 +14,9 @@ namespace SecureByDesign.Host
             Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder
+                        .UseKestrel(options => options.AddServerHeader = false)
+                        .UseStartup<Startup>();
                 });
     }
 }
