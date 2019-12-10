@@ -37,7 +37,7 @@ namespace Tests
         HttpContext = new DefaultHttpContext { User = principal }
     };
     
-    var result = controller.Get();
+    var result = controller.GetById("1");
     
     Assert.IsType<ForbidResult>(result.Result);
  */

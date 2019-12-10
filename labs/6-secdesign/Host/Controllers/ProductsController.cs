@@ -6,7 +6,7 @@ using SecureByDesign.Host.Domain.Services;
 namespace SecureByDesign.Host.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/products")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductsService productsService;
@@ -16,7 +16,7 @@ namespace SecureByDesign.Host.Controllers
             this.productsService = productsService;
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         public async Task<ActionResult<ProductResponseModel>> GetById(string id)
         {
             if (!ProductId.IsValidId(id))

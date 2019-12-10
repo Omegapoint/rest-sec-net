@@ -17,7 +17,7 @@ namespace Tests
         {
             var controller = new ProductsController();
 
-            var claims = new[] { new Claim("scope", "not a valid scope") };
+            var claims = new[] { new Claim("urn:local:not:correct:claim", "true") };
             var identity = new ClaimsIdentity(claims);
             var principal = new ClaimsPrincipal(identity);
 
@@ -40,7 +40,7 @@ namespace Tests
         {
             var controller = new ProductsController();
 
-            var claims = new[] { new Claim("scope", "read:product") };
+            var claims = new[] { new Claim("urn:local:product:read", "true") };
             var identity = new ClaimsIdentity(claims);
             var principal = new ClaimsPrincipal(identity);
 
@@ -61,7 +61,7 @@ namespace Tests
         {
             var controller = new ProductsController();
 
-            var claims = new[] { new Claim("scope", "read:product") };
+            var claims = new[] { new Claim("urn:local:product:read", "true") };
             var identity = new ClaimsIdentity(claims);
             var principal = new ClaimsPrincipal(identity);
 
@@ -80,7 +80,7 @@ namespace Tests
         {
             var controller = new ProductsController();
 
-            var claims = new[] { new Claim("scope", "read:product") };
+            var claims = new[] { new Claim("urn:local:product:read", "true") };
             var identity = new ClaimsIdentity(claims);
             var principal = new ClaimsPrincipal(identity);
 

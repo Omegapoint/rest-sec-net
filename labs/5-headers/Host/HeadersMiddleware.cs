@@ -17,10 +17,6 @@ namespace Headers.Host
             context.Response.OnStarting((state) => {
                 context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
 
-                // Please note that Kestrel will add this header back.
-                // Update class Program to configure Kestrel.
-                context.Response.Headers.Remove("Server");
-
                 return Task.CompletedTask;
             }, null);
 

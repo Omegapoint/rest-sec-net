@@ -23,7 +23,7 @@ You can now first verify that you will get a 401 from the products
 service:
 
 ```
-GET http://localhost:5001/products
+GET http://localhost:5001/api/products/1
 ```
 
 Get an access token from the token endpoint:
@@ -38,6 +38,6 @@ client_id=client&client_secret=secret&scope=products.read&grant_type=client_cred
 And use the returned access token on the products endpoint:
 
 ```
-GET http://localhost:5001/products
+GET http://localhost:5001/api/products/1
 Authorization: bearer <paste your access token here>
 ```
