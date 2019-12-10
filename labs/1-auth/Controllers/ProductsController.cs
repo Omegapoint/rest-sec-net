@@ -32,7 +32,7 @@ namespace Sample.Controllers
             return Forbid();
         }
 
-        private bool HasProductReadAccess(ClaimsPrincipal principal)
+        public bool CanRead(ClaimsPrincipal principal)
         {
             return principal.HasClaim(c => c.Type == "urn:local:product:read" && c.Value == "true");
         }

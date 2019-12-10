@@ -33,7 +33,6 @@ namespace Headers.Host
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseHttpsredirection
             app.UseHsts();
 
             app.UseHeaders();
