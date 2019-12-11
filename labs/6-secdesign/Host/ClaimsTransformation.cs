@@ -24,9 +24,10 @@ namespace SecureByDesign.Host
                 AddClaimIfScope(identity, "products.read",  new Claim(ClaimSettings.UrnLocalProductRead,  "true"));
                 AddClaimIfScope(identity, "products.write", new Claim(ClaimSettings.UrnLocalProductWrite, "true"));
 
-                // Example claim that is not affected by scope, typically lookup from permission configuration data
-                identity.AddClaim(new Claim(ClaimSettings.UrnLocalProductIds, "abc,def"));
-
+                // Often authorization is based on username (sub claim) and needs to be looked up from 
+                // permission configuration data (in a database)
+                LookupUserPermissions(identity);
+                
                 return new ClaimsPrincipal(identity);
             }
 
@@ -39,6 +40,11 @@ namespace SecureByDesign.Host
             {
                 identity.AddClaim(claim);
             }
+        }
+
+        private void LookupUserPermissions(ClaimsIdentity identity){
+            //Get permission based on: identity.Claims.Single(c => c.Type = "sub")
+            identity.AddClaim(new Claim(ClaimSettings.UrnLocalProductIds, "abc,def"));
         }
     }
 }
