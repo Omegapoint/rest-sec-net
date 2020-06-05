@@ -25,8 +25,10 @@ namespace SecureByDesign.Host
                 AddClaimIfScope(identity, "products.write", new Claim(ClaimSettings.UrnLocalProductWrite, "true"));
 
                 // Often authorization is based on username (sub claim) and needs to be looked up from 
-                // permission configuration data (in a database)
-                LookupUserPermissions(identity);
+                // permission configuration data (in a database).
+                // For more complex scenarios this should be done in a dedicated service, 
+                // but it is common to do it here and use the ClaimsPrincipal as ac persissions cache
+                // LookupUserPermissions(identity);
                 
                 return new ClaimsPrincipal(identity);
             }
@@ -40,11 +42,6 @@ namespace SecureByDesign.Host
             {
                 identity.AddClaim(claim);
             }
-        }
-
-        private void LookupUserPermissions(ClaimsIdentity identity){
-            //Get permission based on: identity.Claims.Single(c => c.Type = "sub")
-            identity.AddClaim(new Claim(ClaimSettings.UrnLocalProductIds, "abc,def"));
         }
     }
 }

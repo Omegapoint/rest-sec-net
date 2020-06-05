@@ -23,7 +23,9 @@ namespace SecureByDesign.Host
                 config.Filters.Add(new AuthorizeFilter(policy));
             });
 
+            services.AddDistributedMemoryCache();
             services.AddSingleton<IClaimsTransformation, ClaimsTransformation>();
+            services.AddScoped<IAccessControlService, AccessControlService>();
             services.AddScoped<IProductsService, ProductsService>();
             services.AddScoped<IProductsRepository, ProductsInMemoryRepository>();
             services.AddScoped<ILoggingService, CentralizedLoggingService>();

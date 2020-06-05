@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SecureByDesign.Host.Domain.Model;
 using SecureByDesign.Host.Domain.Services;
@@ -7,6 +8,7 @@ namespace SecureByDesign.Host.Controllers
 {
     [ApiController]
     [Route("/api/products")]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductsService productsService;
@@ -17,6 +19,7 @@ namespace SecureByDesign.Host.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize("ProductRead")]
         public async Task<ActionResult<ProductResponseModel>> GetById(string id)
         {
             if (!ProductId.IsValidId(id))
