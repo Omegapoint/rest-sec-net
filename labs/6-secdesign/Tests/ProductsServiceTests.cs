@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.Extensions.Caching.Memory;
 using SecureByDesign.Host;
 using SecureByDesign.Host.Domain.Model;
 using SecureByDesign.Host.Domain.Services;
@@ -7,60 +9,45 @@ using Xunit;
 
 namespace Tests
 {
+    //Note that the tests assumes a test repository with the products "abc", "def" and "ghi", but not "xyz".
     [Trait("Category", "Unit")]
     public class ProductsServiceTests
     {
         [Fact]
         public async void GetById_ReturnsForbidden_IfNoValidReadClaim()
         {
-            var claims = new[]
-            {
-                new Claim("not valid read claim", "true"),
-                new Claim(ClaimSettings.UrnLocalProductIds, "abc"),
-            };
-            var identity = new ClaimsIdentity(claims);
+            var identity = new ClaimsIdentity(new[]{new Claim(ClaimSettings.UrnLocalIdentity, "testId")});
             var principal = new ClaimsPrincipal(identity);
-            var product = new ProductsService(new ProductsInMemoryRepository(), new CentralizedLoggingService());
+            var cache = new MemoryCache(new MemoryCacheOptions());
+            var permissions = new Permissions{
+                GrantedServicePermissions = new List<ServicePermission>{ServicePermission.ProductWrite},
+                GrantedProducts = new List<ProductId>{new ProductId("abc"), new ProductId("def")}
+            };
+            cache.Set("testId|", permissions);
+            var productsService = new ProductsService(new AccessControlService(cache, new PermissionsInMemoryRepository(), new CentralizedLoggingService()), new ProductsInMemoryRepository(), new CentralizedLoggingService());
 
-            var result = await product.GetById(principal, new ProductId("abc"));
+            var result = await productsService.GetById(principal, new ProductId("abc"));
 
             Assert.Equal(ServiceResult.Forbidden, result.Result);
             Assert.Null(result.Value);
         }
 
         [Fact]
-        public async void GetById_ReturnsForbidden_IfNoValidProductIdClaim()
+        public async void GetById_ReturnsNotfound_IfNoAccessToGivenProduct()
         {
-            var claims = new[]
-            {
-                new Claim(ClaimSettings.UrnLocalProductRead, "true"),
-                new Claim(ClaimSettings.UrnLocalProductIds, "abc"),
-            };
-            var identity = new ClaimsIdentity(claims);
+            var identity = new ClaimsIdentity(new[]{new Claim(ClaimSettings.UrnLocalIdentity, "testId"),});
             var principal = new ClaimsPrincipal(identity);
-            var product = new ProductsService(new ProductsInMemoryRepository(), new CentralizedLoggingService());
-
-            var result = await product.GetById(principal, new ProductId("def"));
-
-            Assert.Equal(ServiceResult.Forbidden, result.Result);
-            Assert.Null(result.Value);
-        }
-
-        [Fact]
-        public async void GetById_ReturnsForbidden_IfNoValidProductIdClaimInLIst()
-        {
-            var claims = new[]
-            {
-                new Claim(ClaimSettings.UrnLocalProductRead, "true"),
-                new Claim(ClaimSettings.UrnLocalProductIds, "abc,def"),
+            var cache = new MemoryCache(new MemoryCacheOptions());
+            var permissions = new Permissions{
+                GrantedServicePermissions = new List<ServicePermission>{ServicePermission.ProductRead},
+                GrantedProducts = new List<ProductId>{new ProductId("abc"), new ProductId("def")}
             };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            var product = new ProductsService(new ProductsInMemoryRepository(), new CentralizedLoggingService());
+            cache.Set("testId|", permissions);
+            var productsService = new ProductsService(new AccessControlService(cache, new PermissionsInMemoryRepository(), new CentralizedLoggingService()), new ProductsInMemoryRepository(), new CentralizedLoggingService());
 
-            var result = await product.GetById(principal, new ProductId("ghi"));
+            var result = await productsService.GetById(principal, new ProductId("ghi"));
 
-            Assert.Equal(ServiceResult.Forbidden, result.Result);
+            Assert.Equal(ServiceResult.NotFound, result.Result);
             Assert.Null(result.Value);
         }
 
@@ -71,16 +58,17 @@ namespace Tests
         [Fact]
         public async void GetById_ReturnsOk_IfValidClaims()
         {
-            var claims = new[]
-            {
-                new Claim(ClaimSettings.UrnLocalProductRead, "true"),
-                new Claim(ClaimSettings.UrnLocalProductIds, "abc"),
-            };
-            var identity = new ClaimsIdentity(claims);
+            var identity = new ClaimsIdentity(new[]{new Claim(ClaimSettings.UrnLocalIdentity, "testId")});
             var principal = new ClaimsPrincipal(identity);
-            var product = new ProductsService(new ProductsInMemoryRepository(), new CentralizedLoggingService());
+            var cache = new MemoryCache(new MemoryCacheOptions());
+            var permissions = new Permissions{
+                GrantedServicePermissions = new List<ServicePermission>{ServicePermission.ProductRead},
+                GrantedProducts = new List<ProductId>{new ProductId("abc"), new ProductId("def")}
+            };
+            cache.Set("testId|", permissions);
+            var productsService = new ProductsService(new AccessControlService(cache, new PermissionsInMemoryRepository(), new CentralizedLoggingService()), new ProductsInMemoryRepository(), new CentralizedLoggingService());
 
-            var result = await product.GetById(principal, new ProductId("abc"));
+            var result = await productsService.GetById(principal, new ProductId("abc"));
 
             Assert.Equal(ServiceResult.Ok, result.Result);
             Assert.NotNull(result.Value);
@@ -89,16 +77,16 @@ namespace Tests
         [Fact]
         public async void GetById_ReturnsNotFound_IfValidClaimButNotExisting()
         {
-            var claims = new[]
-            {
-                new Claim(ClaimSettings.UrnLocalProductRead, "true"),
-                new Claim(ClaimSettings.UrnLocalProductIds, "xyz"),
-            };
-            var identity = new ClaimsIdentity(claims);
+            var identity = new ClaimsIdentity(new[]{new Claim(ClaimSettings.UrnLocalIdentity, "testId")});
             var principal = new ClaimsPrincipal(identity);
-            var product = new ProductsService(new ProductsInMemoryRepository(), new CentralizedLoggingService());
-
-            var result = await product.GetById(principal, new ProductId("xyz"));
+            var cache = new MemoryCache(new MemoryCacheOptions());
+            var permissions = new Permissions{
+                GrantedServicePermissions = new List<ServicePermission>{ServicePermission.ProductRead},
+                GrantedProducts = new List<ProductId>{new ProductId("abc"), new ProductId("def"), new ProductId("xyz")}
+            };
+            cache.Set("testId|", permissions);
+            var productsService = new ProductsService(new AccessControlService(cache, new PermissionsInMemoryRepository(), new CentralizedLoggingService()), new ProductsInMemoryRepository(), new CentralizedLoggingService());
+            var result = await productsService.GetById(principal, new ProductId("xyz"));
 
             Assert.Equal(ServiceResult.NotFound, result.Result);
             Assert.Null(result.Value);

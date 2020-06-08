@@ -1,15 +1,14 @@
-﻿namespace SecureByDesign.Host
+﻿using System.Collections.Generic;
+
+namespace SecureByDesign.Host
 {
     public static class ClaimSettings
-    {
-        //Authorization server scopes
-        public const string ProductsRead = "products.read";
-        public const string ProductsWrite = "products.write";
+    {   
+        public const string UrnLocalIdentity = "urn:local:identity";
 
-        //Local permission claim types
-        public const string UrnLocalProductRead = "urn:local:product:read";
-        public const string UrnLocalProductWrite = "urn:local:product:write";
-        public const string UrnLocalProductIds = "urn:local:product:ids";  
+        public const string Scope = "scope";
+        public const string ScopeProductsRead = "products.read";
+        public const string ScopeProductsWrite = "products.write";
     }
 }
 

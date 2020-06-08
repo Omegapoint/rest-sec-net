@@ -1,27 +1,28 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SecureByDesign.Host.Domain.Model;
 using SecureByDesign.Host.Domain.Services;
 
 namespace SecureByDesign.Host.Controllers
 {
     [ApiController]
-    [Route("/api/permissions")]
+    [Route("/api/user-info")]
     [Authorize]
-    public class PermissionsController : ControllerBase
+    public class UserInfoController : ControllerBase
     {
         private readonly IAccessControlService accessControlService;
 
-        public PermissionsController(IAccessControlService accessControlService)
+        public UserInfoController(IAccessControlService accessControlService)
         {
             this.accessControlService = accessControlService;
         }
 
-        [HttpGet("")]
-        public async Task<ActionResult<Permissions>> GetPermissions()
+        [HttpGet("permissions")]
+        public async Task<ActionResult<PermissionsResponseModel>> GetPermissions()
         {
             var permissions = await accessControlService.GetPermissions(User);
-            return Ok(permissions);
+            return Ok(permissions.MapToPermissionsResponseModel());
         }
     }
 }

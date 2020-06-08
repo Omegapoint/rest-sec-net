@@ -22,7 +22,7 @@ namespace Tests
 
             var controller = new ProductsController(productServiceMock.Object);
 
-            var result = await controller.GetById("abc");
+            var result = await controller.GetProductById("abc");
 
             Assert.IsType<ForbidResult>(result.Result);
         }
@@ -36,7 +36,7 @@ namespace Tests
 
             var controller = new ProductsController(productServiceMock.Object);
 
-            var result = await controller.GetById("abc");
+            var result = await controller.GetProductById("abc");
 
             Assert.IsType<OkObjectResult>(result.Result);
         }
@@ -52,7 +52,7 @@ namespace Tests
 
             var controller = new ProductsController(productServiceMock.Object);
 
-            var result = await controller.GetById(id);
+            var result = await controller.GetProductById(id);
 
             Assert.IsType<BadRequestResult>(result.Result);
         }
@@ -65,7 +65,7 @@ namespace Tests
             
             var controller = new ProductsController(productServiceMock.Object);
 
-            var result = await controller.GetById("def"); // This is a valid, non-existing id
+            var result = await controller.GetProductById("def"); // This is a valid, non-existing id
 
             Assert.IsType<NotFoundResult>(result.Result);
         }

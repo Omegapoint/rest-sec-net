@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using SecureByDesign.Host.Domain.Model;
 
 namespace SecureByDesign.Host.Domain.Services
 {
     public class AccessControlService : IAccessControlService
     {
-        IDistributedCache _permissionsCache;
-        public AccessControlService(IDistributedCache permissionsCache){
+        IMemoryCache _permissionsCache;
+        IPermissionsRepository _permissionsRepository;
+        ILoggingService _loggingService;
+
+        public AccessControlService(IMemoryCache permissionsCache, IPermissionsRepository permissionsRepository, ILoggingService loggingService){
             _permissionsCache = permissionsCache;
+            _permissionsRepository = permissionsRepository;
+            _loggingService = loggingService;
         }
         
         public async Task<Permissions> GetPermissions(IPrincipal principal)
@@ -23,70 +26,53 @@ namespace SecureByDesign.Host.Domain.Services
             var permissions = await LookupUserPermissions(principal);
             return permissions;
         }
-        public async Task<bool> CanRead(IPrincipal principal, Type serviceType)
+        public async Task<bool> CanPerformOperation(IPrincipal principal, ServicePermission servicePermission)
         {
             var permissions = await LookupUserPermissions(principal);
 
-            return permissions.GrantedServices.Contains(serviceType.Name); 
+            return permissions.GrantedServicePermissions.Any(sp => sp == servicePermission);
         }
 
-        public async Task<bool> CanAccess(IPrincipal principal, ProductId requestedProductId)
+        public async Task<bool> CanAccessObject(IPrincipal principal, ProductId requestedProductId)
         {
             var permissions = await LookupUserPermissions(principal);
 
             return permissions.GrantedProducts.Any(p => p == requestedProductId);
         }
 
-        public async Task<bool> CanAccessList(IPrincipal principal, List<Product> requestedProducts)
+        public async Task<bool> CanAccessAllInList(IPrincipal principal, List<Product> requestedProducts)
         {
             var permissions = await LookupUserPermissions(principal);
 
             return requestedProducts.Select(p => p.Id).ToList().All(permissions.GrantedProducts.Contains);
         }
 
+        public async Task<List<Product>> ExcludeUnauthorizedProducts(IPrincipal principal, List<Product> requestedProducts)
+        {
+            var permissions = await LookupUserPermissions(principal);
+            var authorizedProducts = requestedProducts.Where(p => permissions.GrantedProducts.Any(gp => gp == p.Id)).ToList();
+            return authorizedProducts;
+        }
+
         private async Task<Permissions> LookupUserPermissions(IPrincipal principal){
-            var key = (principal.Identity as ClaimsPrincipal).Claims.Single(c => c.Type == "sub").Type;
-            var permissionsAsBytes = await _permissionsCache.GetAsync(key);
-            var permissions = Permissions.CreateFromByteArray(permissionsAsBytes);
+            var identity = (principal as ClaimsPrincipal).Claims.Single(c => c.Type == ClaimSettings.UrnLocalIdentity).Value;
+            var scopes = (principal as ClaimsPrincipal).Claims.Where(c => c.Type == ClaimSettings.Scope).Select(c => c.Value).ToList();
+            var accessControlParameters = new AccessControlParameters(identity, scopes);
+            var key = accessControlParameters.ToCacheKey();
+
+            _permissionsCache.TryGetValue<Permissions>(key, out var permissions);
             if(permissions != null)
                 return permissions;
             
-            //TODO: Get permission from repo based on identity (sub as key)
-            permissions = new Permissions{
-                GrantedServices = new List<string>{typeof(ProductsService).Name},
-                GrantedProducts = new List<ProductId>{new ProductId("abc"), new ProductId("def")}
-            };
+            permissions = await _permissionsRepository.GetPermissions(accessControlParameters);
+            if(permissions == null)
+            {
+                await _loggingService.Log(identity, $"No persmissions found for {key}");
+                return null;
+            }
 
-            await _permissionsCache.SetAsync(key, permissions.ToByteArray(), new DistributedCacheEntryOptions{AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)});
+            _permissionsCache.Set<Permissions>(key, permissions, new MemoryCacheEntryOptions{AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)});
             return permissions;
-        }
-    }
-
-    public class Permissions
-    {
-        public List<string> GrantedServices {get; set;} 
-        public List<ProductId> GrantedProducts {get; set;} 
-
-        public byte[] ToByteArray()
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            using(MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, this);
-                return ms.ToArray();
-            }
-        }
-
-        public static Permissions CreateFromByteArray(byte[] data)
-        {
-            if(data == null)
-                return default(Permissions);
-            BinaryFormatter bf = new BinaryFormatter();
-            using(MemoryStream ms = new MemoryStream(data))
-            {
-                object obj = bf.Deserialize(ms);
-                return (Permissions)obj;
-            }
         }
     }
 }

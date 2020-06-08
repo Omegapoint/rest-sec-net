@@ -10,8 +10,9 @@ namespace SecureByDesign.Host.Domain.Services
     public interface IAccessControlService
     {
         Task<Permissions> GetPermissions(IPrincipal principal);
-        Task<bool> CanRead(IPrincipal principal, Type serviceType);
-        Task<bool> CanAccess(IPrincipal principal, ProductId requestedProductId);
-        Task<bool> CanAccessList(IPrincipal principal, List<Product> requestedProducts);
+        Task<bool> CanPerformOperation(IPrincipal principal, ServicePermission servicePermission);
+        Task<bool> CanAccessObject(IPrincipal principal, ProductId requestedProductId);
+        Task<bool> CanAccessAllInList(IPrincipal principal, List<Product> requestedProducts);
+        Task<List<Product>> ExcludeUnauthorizedProducts(IPrincipal principal, List<Product> requestedProducts);
     }
 }

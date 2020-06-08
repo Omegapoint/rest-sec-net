@@ -15,6 +15,7 @@ namespace SecureByDesign.Host
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
+                        .UseUrls("http://localhost:5009")
                         .UseKestrel(options => options.AddServerHeader = false)
                         .UseStartup<Startup>();
                 });

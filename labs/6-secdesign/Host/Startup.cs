@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -23,9 +24,10 @@ namespace SecureByDesign.Host
                 config.Filters.Add(new AuthorizeFilter(policy));
             });
 
-            services.AddDistributedMemoryCache();
+            services.AddMemoryCache();
             services.AddSingleton<IClaimsTransformation, ClaimsTransformation>();
             services.AddScoped<IAccessControlService, AccessControlService>();
+            services.AddScoped<IPermissionsRepository, PermissionsInMemoryRepository>();
             services.AddScoped<IProductsService, ProductsService>();
             services.AddScoped<IProductsRepository, ProductsInMemoryRepository>();
             services.AddScoped<ILoggingService, CentralizedLoggingService>();
@@ -36,7 +38,7 @@ namespace SecureByDesign.Host
                     options.Authority = "http://localhost:5000/";
                     options.Audience = "products";
                 });
-                        services.AddAuthorization(options =>
+            services.AddAuthorization(options =>
             {
                 //Assert that we always require JWT autentication (except when opt-out with AllowAnonymous attribute)
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
@@ -46,21 +48,6 @@ namespace SecureByDesign.Host
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();
-
-                //Optional: Example of how to use ASP.NET Cores policies
-                options.AddPolicy("ProductRead", policy =>
-                {
-                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireClaim(ClaimSettings.UrnLocalProductRead, "true");
-                });
-
-                options.AddPolicy("ProductWrite", policy =>
-                {
-                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireClaim(ClaimSettings.UrnLocalProductWrite, "true");
-                });
             });
         }
 

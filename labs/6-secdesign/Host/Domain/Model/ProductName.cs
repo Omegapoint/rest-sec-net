@@ -6,7 +6,7 @@ namespace SecureByDesign.Host.Domain.Model
     {
         public ProductName(string name)
         {
-            AssertValidTerm(name);
+            AssertValidName(name);
 
             Value = name;
         }
@@ -18,7 +18,7 @@ namespace SecureByDesign.Host.Domain.Model
             return !string.IsNullOrEmpty(name) && name.Length < 10 && (name.All(char.IsLetterOrDigit) || name.All(char.IsWhiteSpace));
         }
 
-        public static void AssertValidTerm(string name)
+        public static void AssertValidName(string name)
         {
             if (!IsValidName(name))
             {

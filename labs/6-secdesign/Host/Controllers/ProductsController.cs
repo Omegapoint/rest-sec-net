@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,6 @@ using SecureByDesign.Host.Domain.Services;
 namespace SecureByDesign.Host.Controllers
 {
     [ApiController]
-    [Route("/api/products")]
     [Authorize]
     public class ProductsController : ControllerBase
     {
@@ -18,9 +18,8 @@ namespace SecureByDesign.Host.Controllers
             this.productsService = productsService;
         }
 
-        [HttpGet("{id}")]
-        [Authorize("ProductRead")]
-        public async Task<ActionResult<ProductResponseModel>> GetById(string id)
+        [HttpGet("api/products/{id}")]
+        public async Task<ActionResult<ProductResponseModel>> GetProductById(string id)
         {
             if (!ProductId.IsValidId(id))
             {
@@ -42,6 +41,14 @@ namespace SecureByDesign.Host.Controllers
             }
 
             return Ok(productResult.Value.MapToProductResponseModel());
+        }
+
+        //Exampel of how to use [AllowAnonymous]
+        [AllowAnonymous]
+        [HttpGet("api/public/ping")]
+        public ActionResult<string> Ping()
+        {
+            return "ping";
         }
     }
 }
