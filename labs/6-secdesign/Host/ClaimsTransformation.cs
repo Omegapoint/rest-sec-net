@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -17,18 +16,19 @@ namespace SecureByDesign.Host
             {
                 var identity = new ClaimsIdentity(principal.Identity);
 
-                // The idnetity of the user can either be from sub or (depending on IdP) from client_id.
+                // The identity of the user can either be from sub or (depending on IdP) from client_id.
                 // We transform to a local id claim which will be associeated with a permission set later on 
-                AddIdentityClaim(identity);
+                TransformToIdentityClaim(identity);
                 
-                // It is important to honor any scope that affect our domain, but even if we have scope claim(s) in our pricipal
-                // it is good to transform them to applicaion specific claims in order to avoid any dependencies to scope values later on.
-                AddScopeClaims(identity);
+                // Depending on IdP we might get a single scope claim with a space-separated list instead of all scopes as individual claims
+                // (the ASP:NET Core JWT-middleware creates individual claims if the scope claim in the token was a comma-separated list).
+                TransformToScopeClaims(identity);
 
                 // Often authorization is based on username (sub claim) and needs to be looked up from permission configuration data (in a database).
-                // For more complex scenarios this is be done in a dedicated service, but it is also common to do it here and use the ClaimsPrincipal 
-                // as a persissions cache (using claims to represent the permissions).
-                // This example uses a Access control service, instead of making the look up call here. 
+                // For more complex scenarios this is done in a dedicated service, but it is a common pattern to do it here and use the 
+                // ClaimsPrincipal as a persissions cache (using claims to represent the permissions).
+                // This example uses a Access control service, instead of making the look up call here.
+                // AddPermissions(identity); 
                 
                 return new ClaimsPrincipal(identity);
             }
@@ -36,7 +36,12 @@ namespace SecureByDesign.Host
             return principal;
         }
 
-        private void AddIdentityClaim(ClaimsIdentity identity)
+        // Note that we keep the claim values as identities, thus we assume that sub and client_id are unique.
+        // If not we need to handel this differently e g add a suffix (making them unique) or look up the 
+        // unique identity (either here or in the Access Control service later on).
+        // For example, if sub is a "person number" then we might want to transform that to a customer id as 
+        // early as possible (here, if not done by the IdP).
+        private void TransformToIdentityClaim(ClaimsIdentity identity)
         {
             var id = string.Empty;
             
@@ -55,12 +60,13 @@ namespace SecureByDesign.Host
             }
         }
 
-        private void AddScopeClaims(ClaimsIdentity identity)
+        // Note that we do not transform the scope claim values, thus we will have dependencies to this later on in the Access Control service.
+        // If that is hard to adminstrate, it might be better to transform to local/internal scope values we do not have any depndencies to
+        // IdP and protocol specific details after claims transformation.
+        private void TransformToScopeClaims(ClaimsIdentity identity)
         {
             var scopeClaims = identity.Claims.Where(c => c.Value == "scope").ToList(); 
             
-            // Note that depending on IdP we might get a single scope claim with a space-separated list instead of all scopes as individual claims
-            // (the JWT-middleware creates individual claims if scope claim in the token was a comma-separated list)
             if(scopeClaims.Count == 1){
                 var scopeStringList = scopeClaims[0].Value.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (scopeStringList != null && scopeStringList.Count() > 1) {
