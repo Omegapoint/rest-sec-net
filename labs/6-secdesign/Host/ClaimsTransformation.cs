@@ -63,11 +63,11 @@ namespace SecureByDesign.Host
             // (the JWT-middleware creates individual claims if scope claim in the token was a comma-separated list)
             if(scopeClaims.Count == 1){
                 var scopeStringList = scopeClaims[0].Value.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (scopeStringList != null) {
+                if (scopeStringList != null && scopeStringList.Count() > 1) {
+                    scopeClaims.Clear();
                     foreach (var scopeValue in scopeStringList) {
                         scopeClaims.Add(new Claim("scope", scopeValue));
                     }
-                    scopeClaims.RemoveAt(0);
                 }
             }
         }
