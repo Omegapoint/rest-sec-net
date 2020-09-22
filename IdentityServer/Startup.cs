@@ -35,6 +35,10 @@ namespace IdentityServer
                 options.Events.RaiseSuccessEvents = true;
             })
                 .AddTestUsers(TestUsers.Users);
+                //
+                // If you want to add custom claims to the access token:
+                // .AddProfileService<ProfileService>() // User Claims
+                // .AddCustomTokenRequestValidator<CustomTokenRequestValidator>(); // Client claims
 
             // in-memory, code config
             builder.AddInMemoryIdentityResources(Config.Ids);
