@@ -9,28 +9,29 @@ namespace IdentityServer
 {
     public static class Config
     {
-        public static IEnumerable<IdentityResource> Ids =>
+        public static IEnumerable<IdentityResource> IdentityResources =>
             new IdentityResource[]
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
             };
 
+        public static IEnumerable<ApiScope> ApiScopes =>
+            new ApiScope[]
+            {
+                new ApiScope("products.read"),
+                new ApiScope("products.write"),
+            };
 
         public static IEnumerable<ApiResource> Apis =>
             new ApiResource[]
             {
                 new ApiResource("products", "Represents the products domain")
                 { 
-                    Scopes = 
-                    { 
-                        new Scope("products.read"),
-                        new Scope("products.write") 
-                    }
+                    Scopes = new[] { "products.read", "products.write" }
                 }
             };
-
-
+            
         public static IEnumerable<Client> Clients =>
             new Client[]
             {

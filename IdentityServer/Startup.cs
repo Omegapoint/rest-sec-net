@@ -3,7 +3,7 @@
 
 
 using IdentityServer4;
-using IdentityServer4.Quickstart.UI;
+using IdentityServerHost.Quickstart.UI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +41,8 @@ namespace IdentityServer
                 // .AddCustomTokenRequestValidator<CustomTokenRequestValidator>(); // Client claims
 
             // in-memory, code config
-            builder.AddInMemoryIdentityResources(Config.Ids);
+            builder.AddInMemoryIdentityResources(Config.IdentityResources);
+            builder.AddInMemoryApiScopes(Config.ApiScopes);
             builder.AddInMemoryApiResources(Config.Apis);
             builder.AddInMemoryClients(Config.Clients);
 
