@@ -17,6 +17,13 @@ namespace IdentityServer
             };
 
 
+        public static IEnumerable<ApiScope> ApiScopes =>
+            new List<ApiScope>
+            {
+                new ApiScope("products.read", "Read products"),
+                new ApiScope("products.write", "Write products"),
+            };
+
         public static IEnumerable<ApiResource> Apis =>
             new ApiResource[]
             {
@@ -24,8 +31,8 @@ namespace IdentityServer
                 { 
                     Scopes = 
                     { 
-                        new Scope("products.read"),
-                        new Scope("products.write") 
+                        "products.read",
+                        "products.write" 
                     }
                 }
             };
@@ -65,11 +72,34 @@ namespace IdentityServer
                         "http://localhost:5002/popup.html",
                     },
 
+                    BackChannelLogoutUri = "http://localhost:5002/logout-oidc",
                     PostLogoutRedirectUris = { "http://localhost:5002/index.html" },
                     AllowedCorsOrigins = { "http://localhost:5002" },
 
                     AllowedScopes = { "openid", "profile", "products.read" }
                 },
+                new Client
+                {
+                    ClientId = "mvc1",
+                    ClientName = "MVC Client",
+                    ClientUri = "http://identityserver.io",
+
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
+                    RequireClientSecret = false,
+
+                    RedirectUris =
+                    {
+                        "https://localhost:5003/signin-oidc",
+                    },
+
+                    BackChannelLogoutUri = "http://localhost:5003/logout-oidc",
+                    PostLogoutRedirectUris = { "http://localhost:5003/index.html" },
+                    AllowedCorsOrigins = { "http://localhost:5003" },
+
+                    AllowedScopes = { "openid", "profile", "products.read" }
+                },
+                
 
                 // Device Code client
                 new Client
