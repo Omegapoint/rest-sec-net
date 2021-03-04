@@ -18,25 +18,24 @@ namespace IdentityServer
 
 
         public static IEnumerable<ApiScope> ApiScopes =>
-            new List<ApiScope>
+            new ApiScope[]
             {
-                new ApiScope("products.read", "Read products"),
-                new ApiScope("products.write", "Write products"),
+                new ApiScope(Scopes.ProductsRead, "Read products"),
+                new ApiScope(Scopes.ProductsWrite, "Write products"),
             };
 
         public static IEnumerable<ApiResource> Apis =>
             new ApiResource[]
             {
                 new ApiResource("products", "Represents the products domain")
-                { 
-                    Scopes = 
-                    { 
-                        "products.read",
-                        "products.write" 
+                {
+                    Scopes =
+                    {
+                        Scopes.ProductsRead,
+                        Scopes.ProductsWrite
                     }
                 }
             };
-
 
         public static IEnumerable<Client> Clients =>
             new Client[]
@@ -50,14 +49,14 @@ namespace IdentityServer
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
                     ClientSecrets = { new Secret("secret".Sha256()) },
 
-                    AllowedScopes = { "products.read", "products.write" }
+                    AllowedScopes = { Scopes.ProductsRead, Scopes.ProductsWrite }
                 },
 
                 // SPA client using code flow + pkce
                 new Client
                 {
                     ClientId = "spa",
-                    ClientName = "SPA Client",
+                    ClientName = "SPA (with BFF) Client",
                     ClientUri = "http://identityserver.io",
 
                     AllowedGrantTypes = GrantTypes.Code,
@@ -66,21 +65,20 @@ namespace IdentityServer
 
                     RedirectUris =
                     {
-                        "http://localhost:5002/index.html",
-                        "http://localhost:5002/callback.html",
-                        "http://localhost:5002/silent.html",
-                        "http://localhost:5002/popup.html",
+                        "https://localhost:5004/signin-oidc"
                     },
 
-                    BackChannelLogoutUri = "http://localhost:5002/logout-oidc",
-                    PostLogoutRedirectUris = { "http://localhost:5002/index.html" },
-                    AllowedCorsOrigins = { "http://localhost:5002" },
+                    BackChannelLogoutUri = "https://localhost:5004/logout-oidc",
+                    PostLogoutRedirectUris = { "https://localhost:5004/index.html" },
+                    AllowedCorsOrigins = { "https://localhost:5004" },
 
-                    AllowedScopes = { "openid", "profile", "products.read" }
+                    AllowedScopes = { Scopes.Openid, Scopes.Profile, Scopes.ProductsRead }
                 },
+
+                // MVC client using code flow + pkce
                 new Client
                 {
-                    ClientId = "mvc1",
+                    ClientId = "mvc",
                     ClientName = "MVC Client",
                     ClientUri = "http://identityserver.io",
 
@@ -93,14 +91,13 @@ namespace IdentityServer
                         "https://localhost:5003/signin-oidc",
                     },
 
-                    BackChannelLogoutUri = "http://localhost:5003/logout-oidc",
-                    PostLogoutRedirectUris = { "http://localhost:5003/index.html" },
-                    AllowedCorsOrigins = { "http://localhost:5003" },
+                    BackChannelLogoutUri = "https://localhost:5003/logout-oidc",
+                    PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
+                    AllowedCorsOrigins = { "https://localhost:5003" },
 
-                    AllowedScopes = { "openid", "profile", "products.read" }
+                    AllowedScopes = { Scopes.Openid, Scopes.Profile, Scopes.ProductsRead }
                 },
                 
-
                 // Device Code client
                 new Client
                 {
@@ -109,8 +106,19 @@ namespace IdentityServer
                     RequireClientSecret = false,
 
                     AllowedGrantTypes = new[] { "urn:ietf:params:oauth:grant-type:device_code" },
-                    AllowedScopes = { "openid", "profile", "products.read", "products.write" }
+                    AllowedScopes = { Scopes.Openid, Scopes.Profile, Scopes.ProductsRead, Scopes.ProductsWrite }
                 }
             };
+    }
+
+    public static class Scopes
+    {
+        //OIDC
+        public const string Openid = "openid";
+        public const string Profile = "profile";
+
+        //Custom
+        public const string ProductsRead = "products.read";
+        public const string ProductsWrite = "products.write";
     }
 }
