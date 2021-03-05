@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace MvcCode
 {
     /// <summary>
-    /// Based on sample from https://identitymodel.readthedocs.io/en/latest/, where we added some commonly used security and identity features:
+    /// Based on sample from https://identitymodel.readthedocs.io/en/latest/, where we added some commonly used security features:
     /// - CSRF protection, using anti forgery tokens (double submit cookie pattern from https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
     /// - Host prefix cookie name (see more on https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)
     /// - HSTS configuration, note that other security headers should be added but this is often not part of the application code and not part of this repo (see more on https://securityheaders.com/) 

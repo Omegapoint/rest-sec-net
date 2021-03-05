@@ -24,10 +24,10 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Secure">Secure</a>
                         </li>
-                        
-                        <li class="nav-item">
+                        @*The client does not support client-credentials*@
+                        @*<li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CallApiAsClient">Call API (as Client)</a>
-                        </li>
+                        </li>*@
 
                         @if (User.Identity.IsAuthenticated)
                         {

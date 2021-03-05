@@ -14,7 +14,7 @@ namespace MvcCode
 
         public virtual async Task<string> CallApi()
         {
-            return await _client.GetStringAsync("test");
+            return await _client.GetStringAsync("/api/products/1");
         }
     }
 

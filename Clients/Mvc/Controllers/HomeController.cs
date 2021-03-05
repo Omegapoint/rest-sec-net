@@ -26,8 +26,8 @@ namespace MvcCode.Controllers
         {
             var client = _httpClientFactory.CreateClient("user_client");
 
-            var response = await client.GetStringAsync("test");
-            ViewBag.Json = JArray.Parse(response).ToString();
+            var response = await client.GetStringAsync("/api/products/1");
+            ViewBag.Json = response;
 
             return View("CallApi");
         }
@@ -35,7 +35,7 @@ namespace MvcCode.Controllers
         public async Task<IActionResult> CallApiAsUserTyped([FromServices] TypedUserClient client)
         {
             var response = await client.CallApi();
-            ViewBag.Json = JArray.Parse(response).ToString();
+            ViewBag.Json = response;
 
             return View("CallApi");
         }
@@ -45,8 +45,8 @@ namespace MvcCode.Controllers
         {
             var client = _httpClientFactory.CreateClient("client");
 
-            var response = await client.GetStringAsync("test");
-            ViewBag.Json = JArray.Parse(response).ToString();
+            var response = await client.GetStringAsync("/api/products/1");
+            ViewBag.Json = response;
 
             return View("CallApi");
         }
@@ -55,7 +55,7 @@ namespace MvcCode.Controllers
         public async Task<IActionResult> CallApiAsClientTyped([FromServices] TypedClientClient client)
         {
             var response = await client.CallApi();
-            ViewBag.Json = JArray.Parse(response).ToString();
+            ViewBag.Json = response;
 
             return View("CallApi");
         }
