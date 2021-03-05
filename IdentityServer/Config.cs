@@ -14,6 +14,7 @@ namespace IdentityServer
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
+                new IdentityResources.Email(),
             };
 
 
@@ -52,50 +53,28 @@ namespace IdentityServer
                     AllowedScopes = { Scopes.ProductsRead, Scopes.ProductsWrite }
                 },
 
-                // SPA client using code flow + pkce
-                new Client
-                {
-                    ClientId = "spa",
-                    ClientName = "SPA (with BFF) Client",
-                    ClientUri = "http://identityserver.io",
-
-                    AllowedGrantTypes = GrantTypes.Code,
-                    RequirePkce = true,
-                    RequireClientSecret = false,
-
-                    RedirectUris =
-                    {
-                        "https://localhost:5004/signin-oidc"
-                    },
-
-                    BackChannelLogoutUri = "https://localhost:5004/logout-oidc",
-                    PostLogoutRedirectUris = { "https://localhost:5004/index.html" },
-                    AllowedCorsOrigins = { "https://localhost:5004" },
-
-                    AllowedScopes = { Scopes.Openid, Scopes.Profile, Scopes.ProductsRead }
-                },
-
-                // MVC client using code flow + pkce
+                // MVC client using code flow + pkce, with one time refresh-tokens
                 new Client
                 {
                     ClientId = "mvc",
                     ClientName = "MVC Client",
-                    ClientUri = "http://identityserver.io",
+                    ClientUri = "https://localhost:5003",
 
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RequireClientSecret = false,
+                    AllowOfflineAccess = true,
+                    RequireConsent = true,
+                    AllowRememberConsent = true,
 
                     RedirectUris =
                     {
                         "https://localhost:5003/signin-oidc",
                     },
+                    
+                    PostLogoutRedirectUris = { "https://localhost:5003/signout-callback-oidc" },
 
-                    BackChannelLogoutUri = "https://localhost:5003/logout-oidc",
-                    PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
-                    AllowedCorsOrigins = { "https://localhost:5003" },
-
-                    AllowedScopes = { Scopes.Openid, Scopes.Profile, Scopes.ProductsRead }
+                    AllowedScopes = { Scopes.Openid, Scopes.Profile, Scopes.Email, Scopes.OfflineAccess, Scopes.ProductsRead, Scopes.ProductsWrite }
                 },
                 
                 // Device Code client
@@ -106,7 +85,7 @@ namespace IdentityServer
                     RequireClientSecret = false,
 
                     AllowedGrantTypes = new[] { "urn:ietf:params:oauth:grant-type:device_code" },
-                    AllowedScopes = { Scopes.Openid, Scopes.Profile, Scopes.ProductsRead, Scopes.ProductsWrite }
+                    AllowedScopes = { Scopes.Openid, Scopes.Profile, Scopes.ProductsRead }
                 }
             };
     }
@@ -116,6 +95,8 @@ namespace IdentityServer
         //OIDC
         public const string Openid = "openid";
         public const string Profile = "profile";
+        public const string Email = "email";
+        public const string OfflineAccess = "offline_access";
 
         //Custom
         public const string ProductsRead = "products.read";

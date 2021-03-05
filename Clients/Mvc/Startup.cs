@@ -11,9 +11,18 @@ using System.Threading.Tasks;
 
 namespace MvcCode
 {
-    //Based on sample from https://identitymodel.readthedocs.io/en/latest/
+    /// <summary>
+    /// Based on sample from https://identitymodel.readthedocs.io/en/latest/, where we added some commonly used security and identity features:
+    /// - CSRF protection, using anti forgery tokens (double submit cookie pattern from https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
+    /// - Host prefix cookie name (see more on https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)
+    /// - HSTS configuration, note that other security headers should be added but this is often not part of the application code and not part of this repo (see more on https://securityheaders.com/) 
+    /// </summary>
+
     public class Startup
     {
+        private const string Authority = "https://localhost:5009";
+        private const string ApiBaseUrl = "https://localhost:5001";
+
         public void ConfigureServices(IServiceCollection services)
         {
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
@@ -28,7 +37,7 @@ namespace MvcCode
                 .AddCookie("cookie", options =>
                 {
                     options.Cookie.Name = "__Host-client-mvc";
-
+                    
                     options.Events.OnSigningOut = async e =>
                     {
                         await e.HttpContext.RevokeUserRefreshTokenAsync();
@@ -36,23 +45,23 @@ namespace MvcCode
                 })
                 .AddOpenIdConnect("oidc", options =>
                 {
-                    options.Authority = "https://demo.identityserver.io";
+                    options.Authority = Authority;
 
-                    options.ClientId = "interactive.confidential.short";
+                    options.ClientId = "mvc";
                     options.ClientSecret = "secret";
 
                     // code flow + PKCE (PKCE is turned on by default)
                     options.ResponseType = "code";
                     options.UsePkce = true;
-                    //Since we use code+PKCE we can also use query and avpid cookie issues with SameSite-policies for OIDC/OAuth flows
-                    options.ResponseMode = "query";
-
+                    
                     options.Scope.Clear();
+                    //OIDC
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
                     options.Scope.Add("email");
                     options.Scope.Add("offline_access");
-                    options.Scope.Add("api");
+                    //Custom
+                    options.Scope.Add("products.read products.write");
 
                     // not mapped by default
                     options.ClaimActions.MapJsonKey("website", "website");
@@ -71,8 +80,9 @@ namespace MvcCode
                     {
                         OnRedirectToIdentityProvider = ctx =>
                         {
-                            //Often we whant to init the login UI from the request by using ctx.HttpContext.Request
-                            ctx.ProtocolMessage.LoginHint = "tobias.ahnoff+1@omegapoint.se";
+                            //Often we whant to initialize the login UI from the request by using ctx.HttpContext.Request.
+                            //Here we just hard code it to a known Identity Server test user (with password alice).
+                            ctx.ProtocolMessage.LoginHint = "Alice";
                             //ctx.ProtocolMessage.UiLocales = "sv";
 
                             return Task.CompletedTask;
@@ -85,7 +95,7 @@ namespace MvcCode
                 {
                     // client config is inferred from OpenID Connect settings
                     // if you want to specify scopes explicitly, do it here, otherwise the scope parameter will not be sent
-                    options.Client.Scope = "api";
+                    //options.Client.Scope = "products.read";
                 })
                 .ConfigureBackchannelHttpClient()
                     .AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(new[]
@@ -98,25 +108,25 @@ namespace MvcCode
             // registers HTTP client that uses the managed user access token
             services.AddUserAccessTokenClient("user_client", configureClient: client =>
             {
-                client.BaseAddress = new Uri("https://demo.identityserver.io/api/");
+                client.BaseAddress = new Uri(ApiBaseUrl);
             });
 
             // registers HTTP client that uses the managed client access token
             services.AddClientAccessTokenClient("client", configureClient: client =>
             {
-                client.BaseAddress = new Uri("https://demo.identityserver.io/api/");
+                client.BaseAddress = new Uri(ApiBaseUrl);
             });
 
             // registers a typed HTTP client with token management support
             services.AddHttpClient<TypedUserClient>(client =>
             {
-                client.BaseAddress = new Uri("https://demo.identityserver.io/api/");
+                client.BaseAddress = new Uri(ApiBaseUrl);
             })
                 .AddUserAccessTokenHandler();
 
             services.AddHttpClient<TypedClientClient>(client =>
             {
-                client.BaseAddress = new Uri("https://demo.identityserver.io/api/");
+                client.BaseAddress = new Uri(ApiBaseUrl);
             })
                 .AddClientAccessTokenHandler();
 
@@ -139,13 +149,13 @@ namespace MvcCode
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMiddleware<AntiForgeryMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute()
                     .RequireAuthorization();
             });
-
-            app.UseMiddleware<AntiForgeryMiddleware>();
         }
     }
 }
