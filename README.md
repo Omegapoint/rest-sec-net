@@ -1,3 +1,11 @@
+# Deprecated
+
+This repository is deprecated in favor of
+https://github.com/Omegapoint/defence-in-depth
+
+For a Java implementation, see
+https://github.com/Omegapoint/defence-in-depth-java
+
 What is this?
 -------------
 
